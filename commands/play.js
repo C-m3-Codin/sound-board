@@ -20,19 +20,20 @@ module.exports = {
 				.setDescription('Button number (1-9)')
 				.setRequired(true)),
 	async execute(interaction) {
+		let reply;
 		try {
 			const Member = await interaction.guild.members.cache.get(interaction.user.id);
 			const num = interaction.isButton() ? interaction.customId.slice(-1) : interaction.options.get('num').value;
-			if (!num) return await interaction.reply('Something\'s not right');
+			if (!num) return reply = await interaction.reply('Something\'s not right');
 
 			if (Member.voice.channel) {
 				const sources = await getList(interaction.guild.id);
 
-				if (sources == 'error') return await interaction.reply('Something went wrong. Please try again.');
-				if (sources == null || sources == 'empty') return await interaction.reply('Please map your sounds to the buttons using /store command.');
+				if (sources == 'error') return reply = await interaction.reply('Something went wrong. Please try again.');
+				if (sources == null || sources == 'empty') return reply = await interaction.reply('Please map your sounds to the buttons using /store command.');
 
 				const key = 'link' + num.toString();
-				if (!(key in sources)) return await interaction.reply('No sound mapped to this button');
+				if (!(key in sources)) return reply = await interaction.reply('No sound mapped to this button');
 
 				const connection = joinVoiceChannel({
 					channelId: Member.voice.channel.id,
@@ -46,21 +47,21 @@ module.exports = {
 					console.error(error);
 				});
 				player.on(AudioPlayerStatus.Idle, () => {
-					setTimeout(() => { connection.disconnect(); }, 5000);
+					connection.disconnect();
 				});
 				connection.subscribe(player);
 
-				await interaction.reply(`${Member.user.tag} is connected to ${Member.voice.channel.name}!`);
+				reply = await interaction.reply(`${Member.user.tag} played the sound ${sources['label' + num]}!`);
 			}
 			else {
-				await interaction.reply(`${Member.user.tag} is not connected.`);
+				reply = await interaction.reply(`${Member.user.tag} is not connected.`);
 			}
 		}
 		catch (error) {
 			console.log(error);
 		}
 		finally {
-			setTimeout(() => interaction.deleteReply(), 10000);
+			setTimeout(() => {if (reply) interaction.deleteReply(); }, 10000);
 		}
 	},
 };

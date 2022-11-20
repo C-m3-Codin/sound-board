@@ -13,7 +13,7 @@ async function getList(guildId) {
 		if (!doc) return 'empty';
 		const sources = {};
 		Object.keys(doc).forEach(function(key) {
-			if (key.includes('link')) {
+			if (key.includes('link') || key.includes('label')) {
 				sources[key] = doc[key];
 			}
 		});

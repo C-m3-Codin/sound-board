@@ -17,27 +17,28 @@ module.exports = {
 			option.setName('label')
 				.setDescription('Button label')),
 	async execute(interaction) {
+		let reply;
 		try {
 			const num = await interaction.options.get('num').value;
 			const label = await interaction.options.get('label') ? interaction.options.get('label').value : num.toString();
 			const link = await interaction.options.get('link').value;
 			const guildId = await interaction.guild.id;
-			if (!num) return await interaction.reply('Something\'s not right');
+			if (!num) return reply = await interaction.reply('Something\'s not right');
 
 			const res = await setLink(guildId, num, label, link);
 			if (res == 'success') {
-				await interaction.reply(`Successfully mapped button ${num} to ${link}`);
+				reply = await interaction.reply(`Successfully mapped button ${num} to ${link}. \nPlease refresh the soundboard.`);
 			}
 			else {
-				await interaction.reply('Something went wrong. Please try again.');
+				reply = await interaction.reply('Something went wrong. Please try again.');
 			}
 		}
 		catch (error) {
 			console.log(error);
-			await interaction.reply('Something went wrong. Try again later.');
+			reply = await interaction.reply('Something went wrong. Try again later.');
 		}
 		finally {
-			setTimeout(() => interaction.deleteReply(), 10000);
+			setTimeout(() => {if (reply) interaction.deleteReply(); }, 10000);
 		}
 	},
 };

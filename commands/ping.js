@@ -5,7 +5,7 @@ module.exports = {
 		.setName('ping')
 		.setDescription('Replies with Pong!'),
 	async execute(interaction) {
-		await interaction.reply('Pong!');
-		setTimeout(() => interaction.deleteReply(), 10000);
+		const reply = await interaction.reply('Pong!');
+		setTimeout(() => {if (reply) interaction.deleteReply(); }, 10000);
 	},
 };
