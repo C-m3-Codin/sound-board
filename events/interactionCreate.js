@@ -3,9 +3,9 @@ const { Events } = require('discord.js');
 module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction) {
-		if (!interaction.isChatInputCommand()) return;
+		if (!interaction.isChatInputCommand() && !interaction.isButton()) return;
 
-		const command = interaction.client.commands.get(interaction.commandName);
+		const command = interaction.isButton() ? interaction.client.commands.get(interaction.customId.slice(0, -1)) : interaction.client.commands.get(interaction.commandName);
 
 		if (!command) {
 			console.error(`No command matching ${interaction.commandName} was found.`);
